@@ -1,5 +1,5 @@
 import type { NotionPage } from "@/types/notion";
-import type { PostSummary, Post, Tag, Author } from "@/types/post";
+import type { PostSummary, Post, PostNavItem, Tag, Author } from "@/types/post";
 import type { Block } from "@/types/block";
 
 type PageProperty = NotionPage["properties"][string];
@@ -59,6 +59,13 @@ export function mapPostSummary(
     tags: getTags(page, "Tags"),
     publishedAt: getDateStart(page, "PublishedAt") ?? page.created_time,
     readingTimeMinutes,
+  };
+}
+
+export function mapPostNavItem(page: NotionPage): PostNavItem {
+  return {
+    slug: getPlainText(page, "Slug"),
+    title: getTitleText(page, "Title"),
   };
 }
 

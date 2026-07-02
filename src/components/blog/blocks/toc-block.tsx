@@ -1,18 +1,12 @@
 import type { Block, HeadingBlock } from "@/types/block";
 import { RichTextRenderer } from "@/components/blog/blocks/rich-text";
+import { collectHeadings } from "@/utils/headings";
 
 const INDENT_BY_TYPE: Record<HeadingBlock["type"], string> = {
   heading_1: "",
   heading_2: "pl-4",
   heading_3: "pl-8",
 };
-
-function collectHeadings(blocks: Block[]): HeadingBlock[] {
-  return blocks.filter(
-    (block): block is HeadingBlock =>
-      block.type === "heading_1" || block.type === "heading_2" || block.type === "heading_3"
-  );
-}
 
 export function TocBlockComponent({ allBlocks }: { allBlocks: Block[] }) {
   const headings = collectHeadings(allBlocks);

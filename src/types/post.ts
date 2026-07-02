@@ -34,3 +34,8 @@ export type Post = PostSummary & {
   lastSyncedAt: string | null;
   blocks: Block[];
 };
+
+export type PostNavItem = {
+  slug: string;
+  title: string;
+};

@@ -1,0 +1,77 @@
+import type { NotionPage } from "@/types/notion";
+import type { PostSummary, Post, Tag, Author } from "@/types/post";
+import type { Block } from "@/types/block";
+
+type PageProperty = NotionPage["properties"][string];
+
+function getProperty(page: NotionPage, name: string): PageProperty | undefined {
+  return page.properties[name];
+}
+
+function getTitleText(page: NotionPage, name: string): string {
+  const property = getProperty(page, name);
+  if (property?.type !== "title") return "";
+  return property.title.map((item) => item.plain_text).join("");
+}
+
+function getPlainText(page: NotionPage, name: string): string {
+  const property = getProperty(page, name);
+  if (property?.type !== "rich_text") return "";
+  return property.rich_text.map((item) => item.plain_text).join("");
+}
+
+function getDateStart(page: NotionPage, name: string): string | null {
+  const property = getProperty(page, name);
+  if (property?.type !== "date") return null;
+  return property.date?.start ?? null;
+}
+
+function getTags(page: NotionPage, name: string): Tag[] {
+  const property = getProperty(page, name);
+  if (property?.type !== "multi_select") return [];
+  return property.multi_select.map((option) => ({
+    id: option.id,
+    name: option.name,
+    color: option.color,
+  }));
+}
+
+function getCoverUrl(page: NotionPage, name: string): string | null {
+  const property = getProperty(page, name);
+  if (property?.type !== "files") return null;
+  const file = property.files[0];
+  if (!file) return null;
+  return file.type === "file" ? file.file.url : file.external.url;
+}
+
+export function mapPostSummary(
+  page: NotionPage,
+  readingTimeMinutes: number
+): PostSummary {
+  const coverUrl = getCoverUrl(page, "Cover");
+
+  return {
+    id: page.id,
+    slug: getPlainText(page, "Slug"),
+    title: getTitleText(page, "Title"),
+    summary: getPlainText(page, "Summary"),
+    cover: coverUrl ? { url: coverUrl } : null,
+    tags: getTags(page, "Tags"),
+    publishedAt: getDateStart(page, "PublishedAt") ?? page.created_time,
+    readingTimeMinutes,
+  };
+}
+
+export function mapPost(
+  page: NotionPage,
+  blocks: Block[],
+  author: Author,
+  readingTimeMinutes: number
+): Post {
+  return {
+    ...mapPostSummary(page, readingTimeMinutes),
+    author,
+    lastSyncedAt: getDateStart(page, "LastSyncedAt"),
+    blocks,
+  };
+}

@@ -1,6 +1,6 @@
 import { isNotionClientError, APIErrorCode, ClientErrorCode } from "@notionhq/client";
 
-function getNotionErrorMessage(error: unknown): string {
+export function getNotionErrorMessage(error: unknown): string {
   if (isNotionClientError(error)) {
     switch (error.code) {
       case APIErrorCode.RateLimited:

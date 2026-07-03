@@ -6,6 +6,7 @@ import { QuoteBlockComponent } from "@/components/blog/blocks/quote-block";
 import { DividerBlockComponent } from "@/components/blog/blocks/divider-block";
 import { CodeBlockComponent } from "@/components/blog/blocks/code-block";
 import { ImageBlockComponent } from "@/components/blog/blocks/image-block";
+import { VideoBlockComponent } from "@/components/blog/blocks/video-block";
 import { CalloutBlockComponent } from "@/components/blog/blocks/callout-block";
 import { BookmarkBlockComponent } from "@/components/blog/blocks/bookmark-block";
 import { TocBlockComponent } from "@/components/blog/blocks/toc-block";
@@ -73,6 +74,8 @@ function BlockEntry({ block, allBlocks }: { block: Block; allBlocks: Block[] }) 
       return <CodeBlockComponent block={block} />;
     case "image":
       return <ImageBlockComponent block={block} />;
+    case "video":
+      return <VideoBlockComponent block={block} />;
     case "callout":
       return <CalloutBlockComponent block={block} />;
     case "bookmark":

@@ -22,6 +22,7 @@ function blockToText(block: Block): string {
       return `${richTextToPlain(block.richText)} ${collectPlainText(block.children)}`;
     case "bookmark":
     case "image":
+    case "video":
       return richTextToPlain(block.caption);
     case "divider":
     case "table_of_contents":

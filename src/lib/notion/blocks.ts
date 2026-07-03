@@ -89,6 +89,14 @@ async function mapBlock(block: NotionBlock): Promise<Block | null> {
         url: block.image.type === "external" ? block.image.external.url : block.image.file.url,
         caption: toRichText(block.image.caption),
       };
+    case "video":
+      return {
+        id: block.id,
+        type: "video",
+        url: block.video.type === "external" ? block.video.external.url : block.video.file.url,
+        source: block.video.type,
+        caption: toRichText(block.video.caption),
+      };
     case "callout":
       return {
         id: block.id,

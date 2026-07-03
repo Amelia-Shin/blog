@@ -58,6 +58,13 @@ export type ImageBlock = BaseBlock & {
   caption: RichText[];
 };
 
+export type VideoBlock = BaseBlock & {
+  type: "video";
+  url: string;
+  source: "file" | "external";
+  caption: RichText[];
+};
+
 export type CalloutBlock = BaseBlock & {
   type: "callout";
   richText: RichText[];
@@ -89,6 +96,7 @@ export type Block =
   | DividerBlock
   | CodeBlock
   | ImageBlock
+  | VideoBlock
   | CalloutBlock
   | BookmarkBlock
   | TableOfContentsBlock

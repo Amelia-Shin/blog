@@ -25,8 +25,8 @@ export function buildDefaultMetadata(): Metadata {
   };
 }
 
-export function buildPostMetadata(post: Post): Metadata {
-  const url = `${siteConfig.url}/blog/${post.slug}`;
+export function buildPostMetadata(post: Post, basePath: string = "/blog"): Metadata {
+  const url = `${siteConfig.url}${basePath}/${post.slug}`;
   const images = post.cover ? [{ url: post.cover.url }] : undefined;
 
   return {
@@ -64,8 +64,8 @@ type BlogPostingJsonLd = {
   mainEntityOfPage: string;
 };
 
-export function buildPostJsonLd(post: Post): BlogPostingJsonLd {
-  const url = `${siteConfig.url}/blog/${post.slug}`;
+export function buildPostJsonLd(post: Post, basePath: string = "/blog"): BlogPostingJsonLd {
+  const url = `${siteConfig.url}${basePath}/${post.slug}`;
 
   return {
     "@context": "https://schema.org",

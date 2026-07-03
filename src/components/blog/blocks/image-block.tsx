@@ -7,9 +7,15 @@ export function ImageBlockComponent({ block }: { block: ImageBlock }) {
 
   return (
     <figure className="my-4">
-      <div className="relative aspect-video overflow-hidden rounded-md">
-        <Image src={block.url} alt={altText} fill className="object-cover" />
-      </div>
+      <Image
+        src={block.url}
+        alt={altText}
+        width={0}
+        height={0}
+        sizes="100vw"
+        className="h-auto w-full rounded-md"
+        style={{ width: "100%", height: "auto" }}
+      />
       {block.caption.length > 0 && (
         <figcaption className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">
           <RichTextRenderer items={block.caption} />

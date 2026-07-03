@@ -25,7 +25,13 @@ export function PostCard({ post }: PostCardProps) {
           )}
         </div>
         <div className="flex flex-col gap-3 p-5">
-          {post.tags[0] && <TagBadge tag={post.tags[0]} />}
+          {post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 self-start">
+              {post.tags.map((tag) => (
+                <TagBadge key={tag.id} tag={tag} />
+              ))}
+            </div>
+          )}
           <h3 className="line-clamp-2 text-base font-semibold text-zinc-900 dark:text-zinc-50">
             {post.title}
           </h3>

@@ -51,7 +51,20 @@ export function buildPostMetadata(post: Post): Metadata {
   };
 }
 
-export function buildPostJsonLd(post: Post) {
+type BlogPostingJsonLd = {
+  "@context": "https://schema.org";
+  "@type": "BlogPosting";
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified: string;
+  author: { "@type": "Person"; name: string };
+  image: string | undefined;
+  url: string;
+  mainEntityOfPage: string;
+};
+
+export function buildPostJsonLd(post: Post): BlogPostingJsonLd {
   const url = `${siteConfig.url}/blog/${post.slug}`;
 
   return {

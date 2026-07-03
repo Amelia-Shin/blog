@@ -31,13 +31,13 @@ export async function getDataSourceId(): Promise<string> {
   });
 
   if (!isFullDatabase(database)) {
-    throw new Error(`Received a partial Notion database response: ${databaseId}`);
+    throw new Error(`Notion 데이터베이스 응답이 불완전합니다: ${databaseId}`);
   }
 
   const dataSource = database.data_sources[0];
 
   if (!dataSource) {
-    throw new Error(`No data source found for Notion database: ${databaseId}`);
+    throw new Error(`Notion 데이터베이스에 연결된 데이터 소스가 없습니다: ${databaseId}`);
   }
 
   cachedDataSourceId = dataSource.id;

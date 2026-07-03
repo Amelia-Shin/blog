@@ -3,6 +3,9 @@ import { isFullPage, isFullBlock } from "@notionhq/client";
 import { getNotionClient, getDataSourceId } from "@/lib/notion/client";
 import { handleNotionError } from "@/lib/notion/errors";
 import type { NotionPage, NotionBlock } from "@/types/notion";
+import type { PostStatus } from "@/types/post";
+
+const PUBLISHED: PostStatus = "Published";
 
 // Wrapped in React's cache() so repeated calls within the same request/render
 // pass (e.g. generateMetadata + the page component both calling getPost)
@@ -16,7 +19,7 @@ export const getPublishedPosts = cache(async (): Promise<NotionPage[]> => {
       data_source_id: dataSourceId,
       filter: {
         property: "Status",
-        status: { equals: "Published" },
+        status: { equals: PUBLISHED },
       },
       sorts: [{ property: "PublishedAt", direction: "descending" }],
     });
@@ -37,7 +40,7 @@ export const getPostBySlug = cache(async (slug: string): Promise<NotionPage | nu
       filter: {
         and: [
           { property: "Slug", rich_text: { equals: slug } },
-          { property: "Status", status: { equals: "Published" } },
+          { property: "Status", status: { equals: PUBLISHED } },
         ],
       },
       page_size: 1,

@@ -46,8 +46,7 @@ function buildPage(overrides: {
           : [],
       },
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any as NotionPage;
+  } as unknown as NotionPage;
 }
 
 describe("mapPostSummary", () => {

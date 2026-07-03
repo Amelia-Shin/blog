@@ -39,3 +39,10 @@ export type PostNavItem = {
   slug: string;
   title: string;
 };
+
+export type PostSyncStatus = {
+  id: string;
+  slug: string;
+  lastEditedTime: string;
+  lastSyncedAt: string | null;
+};

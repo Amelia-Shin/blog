@@ -1,5 +1,5 @@
 import type { NotionPage } from "@/types/notion";
-import type { PostSummary, Post, PostNavItem, Tag, Author } from "@/types/post";
+import type { PostSummary, Post, PostNavItem, PostSyncStatus, Tag, Author } from "@/types/post";
 import type { Block } from "@/types/block";
 
 type PageProperty = NotionPage["properties"][string];
@@ -66,6 +66,15 @@ export function mapPostNavItem(page: NotionPage): PostNavItem {
   return {
     slug: getPlainText(page, "Slug"),
     title: getTitleText(page, "Title"),
+  };
+}
+
+export function mapPostSyncStatus(page: NotionPage): PostSyncStatus {
+  return {
+    id: page.id,
+    slug: getPlainText(page, "Slug"),
+    lastEditedTime: page.last_edited_time,
+    lastSyncedAt: getDateStart(page, "LastSyncedAt"),
   };
 }
 

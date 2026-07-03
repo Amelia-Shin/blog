@@ -72,3 +72,18 @@ export const getBlocks = cache(async (blockId: string): Promise<NotionBlock[]> =
     return handleNotionError("getBlocks", error);
   }
 });
+
+// Not wrapped in cache() — this is a write, and each call must reach Notion.
+export async function updatePageLastSyncedAt(pageId: string, timestamp: string): Promise<void> {
+  try {
+    const client = getNotionClient();
+    await client.pages.update({
+      page_id: pageId,
+      properties: {
+        LastSyncedAt: { date: { start: timestamp } },
+      },
+    });
+  } catch (error) {
+    handleNotionError("updatePageLastSyncedAt", error);
+  }
+}

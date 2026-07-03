@@ -1,14 +1,5 @@
 import { Client, isFullDatabase } from "@notionhq/client";
-
-function requireEnv(name: string): string {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`Missing environment variable: ${name}`);
-  }
-
-  return value;
-}
+import { requireEnv } from "@/utils/env";
 
 let cachedClient: Client | null = null;
 

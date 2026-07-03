@@ -5,6 +5,8 @@ import { PostHeader } from "@/components/blog/post-header";
 import { PostNavigation } from "@/components/blog/post-navigation";
 import { TableOfContents } from "@/components/blog/table-of-contents";
 import { BlockRenderer } from "@/components/blog/blocks/block-renderer";
+import { ShareButton } from "@/components/posts/share-button";
+import { CommentPlaceholder } from "@/components/posts/comment-placeholder";
 import { getPublishedPosts } from "@/lib/notion/queries";
 import { mapPostNavItem } from "@/lib/notion/mapper";
 import { buildPostMetadata, buildPostJsonLd } from "@/lib/seo";
@@ -42,10 +44,16 @@ export default async function PostPage({ params }: PostPageProps) {
       />
       <article className="min-w-0">
         <PostHeader post={post} />
+        <div className="mt-4">
+          <ShareButton title={post.title} />
+        </div>
         <div className="mt-8">
           <BlockRenderer blocks={post.blocks} />
         </div>
         <PostNavigation previous={adjacent.previous} next={adjacent.next} basePath="/posts" />
+        <div className="mt-12">
+          <CommentPlaceholder />
+        </div>
       </article>
       <TableOfContents blocks={post.blocks} />
     </div>

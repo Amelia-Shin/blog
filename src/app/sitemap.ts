@@ -3,6 +3,8 @@ import { getPublishedPosts } from "@/lib/notion/queries";
 import { mapPostNavItem } from "@/lib/notion/mapper";
 import { siteConfig } from "@/config/site";
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = await getPublishedPosts();
 

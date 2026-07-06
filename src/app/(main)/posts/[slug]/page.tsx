@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPost, getAdjacentPosts } from "@/services/post-service";
+import { getPost, getAdjacentPosts, getRelatedPosts } from "@/services/post-service";
 import { PostHeader } from "@/components/blog/post-header";
 import { PostNavigation } from "@/components/blog/post-navigation";
 import { TableOfContents } from "@/components/blog/table-of-contents";
 import { BlockRenderer } from "@/components/blog/blocks/block-renderer";
+import { ViewCounter } from "@/components/blog/view-counter";
+import { RelatedPosts } from "@/components/blog/related-posts";
 import { ShareButton } from "@/components/posts/share-button";
 import { CommentPlaceholder } from "@/components/posts/comment-placeholder";
 import { getPublishedPosts } from "@/lib/notion/queries";
@@ -36,6 +38,8 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
+  const relatedPosts = await getRelatedPosts(post);
+
   return (
     <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-6 py-12 lg:grid-cols-[1fr_240px]">
       <script
@@ -44,13 +48,15 @@ export default async function PostPage({ params }: PostPageProps) {
       />
       <article className="min-w-0">
         <PostHeader post={post} />
-        <div className="mt-4">
+        <div className="mt-4 flex items-center gap-4">
           <ShareButton title={post.title} />
+          <ViewCounter slug={post.slug} />
         </div>
         <div className="mt-8">
           <BlockRenderer blocks={post.blocks} />
         </div>
         <PostNavigation previous={adjacent.previous} next={adjacent.next} basePath="/posts" />
+        <RelatedPosts posts={relatedPosts} />
         <div className="mt-12">
           <CommentPlaceholder />
         </div>

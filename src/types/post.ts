@@ -35,6 +35,8 @@ export type Post = PostSummary & {
   blocks: Block[];
 };
 
+export type PostPreview = Omit<PostSummary, "readingTimeMinutes">;
+
 export type PostNavItem = {
   slug: string;
   title: string;

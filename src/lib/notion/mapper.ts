@@ -1,5 +1,5 @@
 import type { NotionPage } from "@/types/notion";
-import type { PostSummary, Post, PostNavItem, PostSyncStatus, Tag, Author } from "@/types/post";
+import type { PostSummary, PostPreview, Post, PostNavItem, PostSyncStatus, Tag, Author } from "@/types/post";
 import type { Block } from "@/types/block";
 
 type PageProperty = NotionPage["properties"][string];
@@ -63,6 +63,20 @@ export function mapPostSummary(
     tags: getTags(page, "Tags"),
     publishedAt: getDateStart(page, "PublishedAt") ?? page.created_time,
     readingTimeMinutes,
+  };
+}
+
+export function mapPostPreview(page: NotionPage): PostPreview {
+  const coverUrl = getCoverUrl(page, "Cover");
+
+  return {
+    id: page.id,
+    slug: getPlainText(page, "Slug"),
+    title: getTitleText(page, "Title"),
+    summary: getPlainText(page, "Summary"),
+    cover: coverUrl ? { url: coverUrl } : null,
+    tags: getTags(page, "Tags"),
+    publishedAt: getDateStart(page, "PublishedAt") ?? page.created_time,
   };
 }
 

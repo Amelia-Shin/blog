@@ -18,8 +18,12 @@ async function resolveUrl(kind: ImageKind, id: string): Promise<string | null> {
 
   if (kind === "page-cover") {
     const page = await client.pages.retrieve({ page_id: id });
-    if (!("cover" in page) || !page.cover) return null;
-    return page.cover.type === "file" ? page.cover.file.url : page.cover.external.url;
+    if (!("properties" in page)) return null;
+    const property = page.properties["Cover"];
+    if (property?.type !== "files") return null;
+    const file = property.files[0];
+    if (!file) return null;
+    return file.type === "file" ? file.file.url : file.external.url;
   }
 
   const block = await client.blocks.retrieve({ block_id: id });
@@ -50,11 +54,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "이미지를 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // Signed URL lives ~1h; cache the redirect itself well under that so
-    // repeat views of the same image skip this route (and Notion) entirely.
-    return NextResponse.redirect(url, {
-      status: 307,
-      headers: { "Cache-Control": "public, max-age=1800" },
+    // next/image reads this route's response body directly (it does not
+    // follow redirects for local image sources), so we fetch the signed URL
+    // ourselves and stream the bytes back rather than redirecting to it.
+    const upstream = await fetch(url);
+    if (!upstream.ok || !upstream.body) {
+      return NextResponse.json({ error: "이미지를 불러오지 못했습니다." }, { status: 502 });
+    }
+
+    return new NextResponse(upstream.body, {
+      headers: {
+        "Content-Type": upstream.headers.get("Content-Type") ?? "application/octet-stream",
+        // Signed URL lives ~1h; cache well under that so repeat views of the
+        // same image skip this route (and Notion) entirely.
+        "Cache-Control": "public, max-age=1800",
+      },
     });
   } catch (error) {
     console.error("[api/notion-image]", error);

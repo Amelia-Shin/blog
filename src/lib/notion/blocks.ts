@@ -86,14 +86,23 @@ async function mapBlock(block: NotionBlock): Promise<Block | null> {
       return {
         id: block.id,
         type: "image",
-        url: block.image.type === "external" ? block.image.external.url : block.image.file.url,
+        // Notion-hosted files expire ~1h after being fetched; proxy through
+        // our own route so the URL embedded in ISR-cached pages never itself
+        // goes stale (see src/app/api/notion-image/route.ts).
+        url:
+          block.image.type === "external"
+            ? block.image.external.url
+            : `/api/notion-image?id=${block.id}&kind=block-image`,
         caption: toRichText(block.image.caption),
       };
     case "video":
       return {
         id: block.id,
         type: "video",
-        url: block.video.type === "external" ? block.video.external.url : block.video.file.url,
+        url:
+          block.video.type === "external"
+            ? block.video.external.url
+            : `/api/notion-image?id=${block.id}&kind=block-video`,
         source: block.video.type,
         caption: toRichText(block.video.caption),
       };

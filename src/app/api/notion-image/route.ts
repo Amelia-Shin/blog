@@ -1,0 +1,63 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { getNotionClient } from "@/lib/notion/client";
+import { getNotionErrorMessage } from "@/lib/notion/errors";
+
+export const dynamic = "force-dynamic";
+
+type ImageKind = "page-cover" | "block-image" | "block-video";
+
+// Notion-hosted files ("file" type) are served from S3 presigned URLs that
+// expire ~1 hour after Notion generates them. Baking those URLs directly into
+// ISR-cached pages (revalidate = 3600) means a page served stale right after
+// expiry shows broken images until the background revalidation catches up.
+// This route re-resolves a fresh URL from Notion on every request and
+// redirects to it, so the image src embedded in cached HTML never itself
+// expires — only the redirect target does.
+async function resolveUrl(kind: ImageKind, id: string): Promise<string | null> {
+  const client = getNotionClient();
+
+  if (kind === "page-cover") {
+    const page = await client.pages.retrieve({ page_id: id });
+    if (!("cover" in page) || !page.cover) return null;
+    return page.cover.type === "file" ? page.cover.file.url : page.cover.external.url;
+  }
+
+  const block = await client.blocks.retrieve({ block_id: id });
+  if (!("type" in block)) return null;
+
+  if (kind === "block-image" && block.type === "image") {
+    return block.image.type === "file" ? block.image.file.url : block.image.external.url;
+  }
+
+  if (kind === "block-video" && block.type === "video") {
+    return block.video.type === "file" ? block.video.file.url : block.video.external.url;
+  }
+
+  return null;
+}
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const id = request.nextUrl.searchParams.get("id");
+  const kind = request.nextUrl.searchParams.get("kind") as ImageKind | null;
+
+  if (!id || !kind) {
+    return NextResponse.json({ error: "id, kind 파라미터가 필요합니다." }, { status: 400 });
+  }
+
+  try {
+    const url = await resolveUrl(kind, id);
+    if (!url) {
+      return NextResponse.json({ error: "이미지를 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    // Signed URL lives ~1h; cache the redirect itself well under that so
+    // repeat views of the same image skip this route (and Notion) entirely.
+    return NextResponse.redirect(url, {
+      status: 307,
+      headers: { "Cache-Control": "public, max-age=1800" },
+    });
+  } catch (error) {
+    console.error("[api/notion-image]", error);
+    return NextResponse.json({ error: getNotionErrorMessage(error) }, { status: 500 });
+  }
+}

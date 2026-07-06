@@ -41,7 +41,11 @@ function getCoverUrl(page: NotionPage, name: string): string | null {
   if (property?.type !== "files") return null;
   const file = property.files[0];
   if (!file) return null;
-  return file.type === "file" ? file.file.url : file.external.url;
+  // Notion-hosted files expire ~1h after being fetched; proxy through our own
+  // route so the URL embedded in ISR-cached pages never itself goes stale.
+  return file.type === "file"
+    ? `/api/notion-image?id=${page.id}&kind=page-cover`
+    : file.external.url;
 }
 
 export function mapPostSummary(

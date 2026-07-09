@@ -10,7 +10,7 @@ type LatestPostsProps = {
 export function LatestPosts({ posts }: LatestPostsProps) {
   const latest = [...posts]
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-    .slice(0, 5);
+    .slice(0, 4);
 
   return (
     <section className="flex flex-col gap-6 py-12">

@@ -13,6 +13,27 @@ function toRichText(items: RichTextItemResponse[]): RichText[] {
   }));
 }
 
+const WIDTH_TAG = /\s*\{w:(\d+)\}\s*$/i;
+
+// Notion image blocks don't expose the display width the author dragged in
+// the editor, so authors encode it as a "{w:400}" suffix on the caption;
+// strip that tag out of the displayed caption and use it as the max width.
+function extractWidth(caption: RichText[]): { caption: RichText[]; width?: number } {
+  if (caption.length === 0) return { caption };
+
+  const last = caption[caption.length - 1];
+  const match = last.text.match(WIDTH_TAG);
+  if (!match) return { caption };
+
+  const width = Number(match[1]);
+  const text = last.text.slice(0, match.index);
+  const trimmedCaption = text
+    ? [...caption.slice(0, -1), { ...last, text }]
+    : caption.slice(0, -1);
+
+  return { caption: trimmedCaption, width };
+}
+
 function getIcon(icon: CalloutIcon): string | null {
   if (!icon) return null;
   if (icon.type === "emoji") return icon.emoji;
@@ -89,7 +110,8 @@ async function mapBlock(block: NotionBlock): Promise<Block | null> {
         richText: toRichText(block.code.rich_text),
         language: block.code.language,
       };
-    case "image":
+    case "image": {
+      const { caption, width } = extractWidth(toRichText(block.image.caption));
       return {
         id: block.id,
         type: "image",
@@ -100,8 +122,10 @@ async function mapBlock(block: NotionBlock): Promise<Block | null> {
           block.image.type === "external"
             ? block.image.external.url
             : `/api/notion-image?id=${block.id}&kind=block-image`,
-        caption: toRichText(block.image.caption),
+        caption,
+        width,
       };
+    }
     case "video":
       return {
         id: block.id,

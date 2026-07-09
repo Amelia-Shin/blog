@@ -56,6 +56,7 @@ export type ImageBlock = BaseBlock & {
   type: "image";
   url: string;
   caption: RichText[];
+  width?: number;
 };
 
 export type VideoBlock = BaseBlock & {

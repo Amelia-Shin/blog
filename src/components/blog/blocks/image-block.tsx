@@ -13,8 +13,8 @@ export function ImageBlockComponent({ block }: { block: ImageBlock }) {
         width={0}
         height={0}
         sizes="100vw"
-        className="h-auto w-full rounded-md"
-        style={{ width: "100%", height: "auto" }}
+        className={`mx-auto h-auto w-full rounded-md ${block.width ? "" : "max-w-xl"}`}
+        style={{ width: "100%", height: "auto", maxWidth: block.width ? `${block.width}px` : undefined }}
       />
       {block.caption.length > 0 && (
         <figcaption className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">

@@ -67,6 +67,13 @@ async function mapBlock(block: NotionBlock): Promise<Block | null> {
         richText: toRichText(block.numbered_list_item.rich_text),
         children: block.has_children ? await mapChildren(block.id) : [],
       };
+    case "to_do":
+      return {
+        id: block.id,
+        type: "bulleted_list_item",
+        richText: toRichText(block.to_do.rich_text),
+        children: block.has_children ? await mapChildren(block.id) : [],
+      };
     case "quote":
       return {
         id: block.id,

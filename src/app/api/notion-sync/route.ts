@@ -4,14 +4,25 @@ import { syncPublishedPosts } from "@/services/sync-service";
 
 export const dynamic = "force-dynamic";
 
-// NOTION_SYNC_SECRET is optional but strongly recommended: this route triggers
-// real Vercel deployments, so an unauthenticated public URL is a cost/abuse risk.
+// This route triggers real Vercel deployments, so an unauthenticated public
+// URL is a cost/abuse risk. Two auth paths are accepted:
+// - Vercel Cron Jobs auto-send `Authorization: Bearer $CRON_SECRET` when a
+//   CRON_SECRET env var is set on the project.
+// - Manual/external calls can pass NOTION_SYNC_SECRET via query param or header.
+// If neither env var is configured, the route stays open (unset = not enforced).
 function isAuthorized(request: NextRequest): boolean {
-  const secret = process.env.NOTION_SYNC_SECRET;
-  if (!secret) return true;
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && request.headers.get("authorization") === `Bearer ${cronSecret}`) {
+    return true;
+  }
 
-  const provided = request.nextUrl.searchParams.get("secret") ?? request.headers.get("x-sync-secret");
-  return provided === secret;
+  const syncSecret = process.env.NOTION_SYNC_SECRET;
+  if (syncSecret) {
+    const provided = request.nextUrl.searchParams.get("secret") ?? request.headers.get("x-sync-secret");
+    if (provided === syncSecret) return true;
+  }
+
+  return !cronSecret && !syncSecret;
 }
 
 async function handleSync(request: NextRequest): Promise<NextResponse> {

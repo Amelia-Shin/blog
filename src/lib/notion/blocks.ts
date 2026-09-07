@@ -160,6 +160,20 @@ async function mapBlock(block: NotionBlock): Promise<Block | null> {
         richText: toRichText(block.toggle.rich_text),
         children: block.has_children ? await mapChildren(block.id) : [],
       };
+    case "column":
+      return {
+        id: block.id,
+        type: "column",
+        children: block.has_children ? await mapChildren(block.id) : [],
+      };
+    case "column_list": {
+      const columns = block.has_children ? await mapChildren(block.id) : [];
+      return {
+        id: block.id,
+        type: "column_list",
+        columns: columns.filter((child): child is Extract<Block, { type: "column" }> => child.type === "column"),
+      };
+    }
     default:
       return null;
   }

@@ -11,6 +11,7 @@ import { CalloutBlockComponent } from "@/components/blog/blocks/callout-block";
 import { BookmarkBlockComponent } from "@/components/blog/blocks/bookmark-block";
 import { TocBlockComponent } from "@/components/blog/blocks/toc-block";
 import { ToggleBlockComponent } from "@/components/blog/blocks/toggle-block";
+import { ColumnListBlockComponent } from "@/components/blog/blocks/column-list-block";
 
 type ListGroup = {
   type: "bulleted_list_item" | "numbered_list_item";
@@ -84,6 +85,10 @@ function BlockEntry({ block, allBlocks }: { block: Block; allBlocks: Block[] }) 
       return <TocBlockComponent allBlocks={allBlocks} />;
     case "toggle":
       return <ToggleBlockComponent block={block} />;
+    case "column_list":
+      return <ColumnListBlockComponent block={block} />;
+    case "column":
+      return <BlockRenderer blocks={block.children} />;
     case "bulleted_list_item":
     case "numbered_list_item":
       return null;

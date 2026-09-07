@@ -27,6 +27,10 @@ function blockToText(block: Block): string {
     case "divider":
     case "table_of_contents":
       return "";
+    case "column":
+      return collectPlainText(block.children);
+    case "column_list":
+      return block.columns.map((column) => collectPlainText(column.children)).join(" ");
   }
 }
 

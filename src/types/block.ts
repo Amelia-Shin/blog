@@ -88,6 +88,16 @@ export type ToggleBlock = BaseBlock & {
   children: Block[];
 };
 
+export type ColumnBlock = BaseBlock & {
+  type: "column";
+  children: Block[];
+};
+
+export type ColumnListBlock = BaseBlock & {
+  type: "column_list";
+  columns: ColumnBlock[];
+};
+
 export type Block =
   | ParagraphBlock
   | HeadingBlock
@@ -101,4 +111,6 @@ export type Block =
   | CalloutBlock
   | BookmarkBlock
   | TableOfContentsBlock
-  | ToggleBlock;
+  | ToggleBlock
+  | ColumnListBlock
+  | ColumnBlock;

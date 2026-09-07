@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(
-    () => typeof document !== "undefined" && document.documentElement.classList.contains("dark"),
-  );
+  // Start assuming light to match the server-rendered markup exactly; the
+  // beforeInteractive theme script may have already set `dark` on <html> by
+  // the time we mount, so reading it here in useState would mismatch SSR.
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // Syncs from the DOM class the beforeInteractive theme script already
+    // set, which isn't knowable during the server render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, []);
 
   function toggleTheme() {
     const next = !isDark;

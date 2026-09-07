@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock } from "lucide-react";
 import { Card } from "@/components/common/card";
 import { TagBadge } from "@/components/blog/tag-badge";
+import { PostCoverImage } from "@/components/posts/post-cover-image";
 import { formatDate } from "@/utils/date";
 import type { PostSummary } from "@/types/post";
 
@@ -14,16 +14,11 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <Link href={`/posts/${post.slug}`}>
       <Card className="group h-full overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700">
-        <div className="relative aspect-video w-full bg-zinc-100 dark:bg-zinc-900">
-          {post.cover && (
-            <Image
-              src={post.cover.url}
-              alt={post.title}
-              fill
-              className="object-cover transition-transform group-hover:scale-105"
-            />
-          )}
-        </div>
+        {post.cover ? (
+          <PostCoverImage src={post.cover.url} alt={post.title} />
+        ) : (
+          <div className="aspect-video w-full bg-zinc-100 dark:bg-zinc-900" />
+        )}
         <div className="flex flex-col gap-3 p-5">
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 self-start">

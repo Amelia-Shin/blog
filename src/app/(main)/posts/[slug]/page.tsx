@@ -7,7 +7,6 @@ import { TableOfContents } from "@/components/blog/table-of-contents";
 import { BlockRenderer } from "@/components/blog/blocks/block-renderer";
 import { ViewCounter } from "@/components/blog/view-counter";
 import { RelatedPosts } from "@/components/blog/related-posts";
-import { PostCoverImage } from "@/components/posts/post-cover-image";
 import { ShareButton } from "@/components/posts/share-button";
 import { CommentPlaceholder } from "@/components/posts/comment-placeholder";
 import { getPublishedPosts } from "@/lib/notion/queries";
@@ -53,11 +52,6 @@ export default async function PostPage({ params }: PostPageProps) {
           <ShareButton />
           <ViewCounter slug={post.slug} />
         </div>
-        {post.cover && (
-          <div className="mt-8 overflow-hidden rounded-xl">
-            <PostCoverImage src={post.cover.url} alt={post.title} />
-          </div>
-        )}
         <div className="mt-8">
           <BlockRenderer blocks={post.blocks} />
         </div>

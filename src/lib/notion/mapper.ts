@@ -43,8 +43,11 @@ function getCoverUrl(page: NotionPage, name: string): string | null {
   if (!file) return null;
   // Notion-hosted files expire ~1h after being fetched; proxy through our own
   // route so the URL embedded in ISR-cached pages never itself goes stale.
+  // `v` busts the route's 30min Cache-Control and Next Image's optimizer
+  // cache when the page (and thus its cover) is edited in Notion — otherwise
+  // both keep serving the old cover's bytes under this same id-based URL.
   return file.type === "file"
-    ? `/api/notion-image?id=${page.id}&kind=page-cover`
+    ? `/api/notion-image?id=${page.id}&kind=page-cover&v=${encodeURIComponent(page.last_edited_time)}`
     : file.external.url;
 }
 

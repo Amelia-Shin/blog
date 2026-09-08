@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { LayoutGrid, List, Search } from "lucide-react";
 import { PostGrid } from "@/components/posts/post-grid";
+import { PostList } from "@/components/posts/post-list";
 import { cn } from "@/lib/cn";
 import type { PostSummary } from "@/types/post";
 
 type SortOrder = "latest" | "oldest";
+type ViewMode = "grid" | "list";
 
 type PostsExplorerProps = {
   posts: PostSummary[];
@@ -16,6 +18,7 @@ export function PostsExplorer({ posts }: PostsExplorerProps) {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>("latest");
+  const [view, setView] = useState<ViewMode>("grid");
 
   const tags = useMemo(
     () => [...new Set(posts.flatMap((post) => post.tags.map((tag) => tag.name)))],
@@ -54,37 +57,41 @@ export function PostsExplorer({ posts }: PostsExplorerProps) {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTag(null)}
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+              activeTag === null
+                ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
+                : "border border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-50",
+            )}
+          >
+            전체
+          </button>
+          {tags.map((tag) => (
             <button
+              key={tag}
               type="button"
-              onClick={() => setActiveTag(null)}
+              onClick={() => setActiveTag(tag)}
               className={cn(
                 "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-                activeTag === null
+                activeTag === tag
                   ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
                   : "border border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-50",
               )}
             >
-              전체
+              {tag}
             </button>
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => setActiveTag(tag)}
-                className={cn(
-                  "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-                  activeTag === tag
-                    ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
-                    : "border border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-50",
-                )}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
+          ))}
+        </div>
+      </div>
 
+      <div className="mt-6 flex items-center justify-between gap-4">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">{visiblePosts.length}개의 글</p>
+
+        <div className="flex items-center gap-2">
           <select
             value={sortOrder}
             onChange={(event) => setSortOrder(event.target.value as SortOrder)}
@@ -93,13 +100,42 @@ export function PostsExplorer({ posts }: PostsExplorerProps) {
             <option value="latest">최신순</option>
             <option value="oldest">오래된순</option>
           </select>
+
+          <div className="flex items-center gap-1 rounded-full border border-zinc-200 p-1 dark:border-zinc-800">
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              aria-label="그리드 보기"
+              aria-pressed={view === "grid"}
+              className={cn(
+                "inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors",
+                view === "grid"
+                  ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
+                  : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50",
+              )}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              aria-label="리스트 보기"
+              aria-pressed={view === "list"}
+              className={cn(
+                "inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors",
+                view === "list"
+                  ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
+                  : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50",
+              )}
+            >
+              <List className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <p className="mt-6 text-sm text-zinc-500 dark:text-zinc-400">{visiblePosts.length}개의 글</p>
-
       <div className="mt-4">
-        <PostGrid posts={visiblePosts} />
+        {view === "grid" ? <PostGrid posts={visiblePosts} /> : <PostList posts={visiblePosts} />}
       </div>
     </div>
   );
